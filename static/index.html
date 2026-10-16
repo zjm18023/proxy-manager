@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#0d1214">
+  <meta name="description" content="红嘴鸥代理服务：独立管理代理订阅、地区筛选与节点出口。">
+  <title>红嘴鸥代理服务</title>
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/network.css?v=20261015-hongzuiou-r1">
+  <link rel="stylesheet" href="/static/compact.css?v=20261015-hongzuiou-r1">
+  <script src="/static/effects.js?v=20261015-hongzuiou-r1" defer></script>
+  <script src="/static/app.js?v=20261015-hongzuiou-r1" defer></script>
+</head>
+<body>
+  <a href="#main" class="skip">跳到主要内容</a>
+  <section id="login-screen" class="login-screen" hidden>
+    <div class="login-intro">
+      <div class="brand"><span class="brand-mark" aria-hidden="true"><i></i></span><span>红嘴鸥代理服务<small>PROXY SERVICE</small></span></div>
+      <div class="login-copy"><span class="eyebrow">掌控每一次连接</span><h1>你的节点，<br>由你<span>掌控。</span></h1><p>汇集订阅，筛选地区，选择出口。<br>让不同应用，连接同一个可靠入口。</p></div>
+      <div class="login-orbit"><canvas id="login-globe" aria-hidden="true"></canvas><span class="orbit-caption">GLOBAL NETWORK / 连接示意</span></div>
+      <div class="intro-foot"><span>多订阅管理</span><i></i><span>智能节点选择</span><i></i><span>统一代理入口</span></div>
+    </div>
+    <div class="login-panel"><form id="login-form" class="login-form">
+      <span class="login-lock"><span class="icon icon-lock" aria-hidden="true"></span></span>
+      <span class="eyebrow">你的代理工作空间</span><h2 id="login-title">登录管理页面</h2><p id="login-hint" class="muted">输入管理密码，继续管理你的连接。</p>
+      <label for="password">管理密码</label><input id="password" name="password" type="password" minlength="10" maxlength="128" autocomplete="current-password" required placeholder="请输入管理密码">
+      <p class="field-note">密码至少 10 位，登录状态保留 12 小时。</p><p id="login-error" class="error" role="alert"></p><button type="submit" class="primary wide" id="login-submit">登录</button>
+      <div class="login-private"><span class="icon icon-lock" aria-hidden="true"></span>订阅与配置保存在你自己的服务中</div>
+    </form></div>
+  </section>
+  <div id="app" class="app" hidden>
+    <aside class="sidebar">
+      <a href="#subscriptions" class="brand"><span class="brand-mark" aria-hidden="true"><i></i></span><span>红嘴鸥代理服务<small>PROXY SERVICE</small></span></a>
+      <div class="workspace-label"><span class="workspace-symbol">P</span><div>我的代理网络<small>独立工作空间</small></div></div>
+      <p class="nav-label">网络管理</p>
+      <nav aria-label="主导航">
+        <a href="#subscriptions" data-view="subscriptions"><span class="icon icon-subscriptions" aria-hidden="true"></span><span class="nav-text">订阅管理</span><span class="nav-count" id="nav-sub-count">0</span></a>
+        <a href="#nodes" data-view="nodes"><span class="icon icon-globe" aria-hidden="true"></span><span class="nav-text">全部节点</span><span class="nav-count" id="nav-node-count">0</span></a>
+        <a href="#filters" data-view="filters"><span class="icon icon-filter" aria-hidden="true"></span><span class="nav-text">地区与筛选</span></a>
+        <a href="#settings" data-view="settings"><span class="icon icon-settings" aria-hidden="true"></span><span class="nav-text">连接设置</span></a>
+        <a href="#activity" data-view="activity"><span class="icon icon-clock" aria-hidden="true"></span><span class="nav-text">活动记录</span></a>
+      </nav>
+      <div class="sidebar-foot"><div class="service-box"><div class="service-indicator"><i id="core-dot"></i><span id="sidebar-status">正在连接</span></div><p>HTTP / SOCKS5 统一入口</p><div class="service-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div><button class="logout" id="logout"><span class="icon icon-logout" aria-hidden="true"></span>退出登录</button></div>
+    </aside>
+    <div class="workspace">
+      <header class="topbar"><div class="breadcrumb"><span class="icon icon-globe" aria-hidden="true"></span><span>工作空间</span><span class="breadcrumb-slash">/</span><strong id="breadcrumb-page">订阅管理</strong></div><div><span id="last-sync">正在获取状态</span><button id="motion-toggle" class="quiet" aria-pressed="true">动效已开</button><button id="reload" class="quiet"><span class="icon icon-refresh" aria-hidden="true"></span><span>刷新状态</span></button><button id="logout-mobile" class="quiet mobile-only">退出</button></div></header>
+      <main id="main" tabindex="-1">
+        <div id="connection-error" class="banner danger" role="alert" hidden></div><div id="core-warning" class="banner warning" hidden></div>
+        <section class="page-heading"><div><span class="eyebrow" id="page-kicker">SUBSCRIPTIONS</span><h1 id="page-title">订阅管理</h1><p id="page-description">把多个订阅汇集在一起，保持节点持续更新。</p></div><div id="page-actions"></div></section>
+        <section class="connection-summary" id="connection-summary" aria-label="当前连接摘要">
+          <span class="summary-orb" aria-hidden="true"><span class="icon icon-signal"></span></span>
+          <div class="summary-exit"><span class="summary-label">当前出口</span><strong id="compact-node">正在获取节点</strong><small id="compact-source">正在获取来源</small></div>
+          <div class="summary-mode"><span id="compact-mode" class="mode-badge">正在获取模式</span><span id="compact-tier" class="badge" hidden></span></div>
+          <div class="summary-health"><span id="compact-health">等待检测</span><strong id="compact-latency">—</strong></div>
+          <button class="quiet summary-details" data-action="open-connection" aria-haspopup="dialog">连接详情<span class="icon icon-arrow" aria-hidden="true"></span></button>
+        </section>
+        <div id="content" aria-live="polite"><div class="loading-workspace" aria-label="正在加载"><i></i><i></i><i></i></div></div>
+        <footer><span><span class="footer-mark" aria-hidden="true"></span>红嘴鸥代理服务</span><span id="footer-address">HTTP / SOCKS5</span></footer>
+      </main>
+    </div>
+  </div>
+  <dialog id="workspace-drawer" class="side-drawer" aria-labelledby="drawer-title">
+    <div class="drawer-shell"><header class="drawer-header"><div><span class="eyebrow" id="drawer-kicker">NETWORK</span><h2 id="drawer-title">连接详情</h2></div><button type="button" id="close-drawer" class="quiet">关闭</button></header>
+      <div class="drawer-body">
+        <section id="drawer-connection" data-drawer-panel="connection" hidden>
+        <section class="route-stage" id="route-stage" aria-label="当前代理出口">
+          <div class="route-info"><div class="route-heading"><span class="route-label"><span class="icon icon-signal" aria-hidden="true"></span>当前连接</span><span id="route-mode-badge" class="mode-badge">正在获取模式</span><span id="route-tier-badge" class="badge" hidden></span><span id="route-status" class="connection-state">正在获取状态</span></div><h2 id="route-node">正在连接你的网络</h2><p id="route-source">正在获取出口信息</p><div class="connection-path" aria-label="代理连接路径"><span>你的应用</span><i></i><span class="path-proxy">代理入口</span><i></i><span id="route-destination">等待节点</span></div><div class="route-endpoint"><code id="route-entry">127.0.0.1:7891</code><span class="endpoint-protocol">HTTP / SOCKS5</span><button class="endpoint-copy quiet" data-action="copy-http" aria-label="复制 HTTP 代理地址"><span class="icon icon-copy" aria-hidden="true"></span></button></div></div>
+          <div class="route-network"><canvas id="network-globe" aria-hidden="true"></canvas><div class="network-label"><span class="network-cross" aria-hidden="true">+</span><span id="network-caption">节点地区分布</span></div><span class="network-footnote">按节点名称识别的地区示意</span></div>
+          <div class="scan-line" aria-hidden="true"></div>
+        </section>
+        <section class="metrics" aria-label="代理概况">
+          <div><span class="metric-label"><span class="icon icon-subscriptions" aria-hidden="true"></span>已启用订阅</span><strong id="metric-subs">—</strong><small id="metric-subs-note">正在加载</small></div>
+          <div><span class="metric-label"><span class="icon icon-globe" aria-hidden="true"></span>候选节点</span><strong id="metric-nodes">—</strong><small id="metric-nodes-note">已应用筛选</small></div>
+          <div><span class="metric-label"><span class="icon icon-signal" aria-hidden="true"></span>检测可用</span><strong id="metric-available">—</strong><small id="metric-available-note">尚未检测</small></div>
+          <div class="current-metric"><span class="metric-label"><span class="icon icon-clock" aria-hidden="true"></span>当前延迟</span><strong id="metric-current">—</strong><small id="metric-mode">自动选择</small></div>
+        </section>
+          <p class="field-note">地区球体是节点名称识别的示意；检测延迟不代表所有业务都可用。</p>
+        </section>
+        <section id="drawer-routing" data-drawer-panel="routing" hidden><div id="routing-editor"></div></section>
+        <section id="drawer-policy" data-drawer-panel="policy" hidden><div id="policy-content"></div></section>
+      </div>
+      <div id="drawer-unsaved" class="drawer-unsaved" role="alert" hidden><p>选路策略尚未保存，关闭后将放弃这些修改。</p><div><button type="button" id="drawer-keep" class="primary">继续编辑</button><button type="button" id="drawer-discard">放弃并关闭</button></div></div>
+    </div>
+  </dialog>
+  <dialog id="subscription-dialog" aria-labelledby="subscription-title"><form id="subscription-form"><div class="dialog-head"><h2 id="subscription-title">添加订阅</h2><button type="button" class="quiet" id="close-dialog" aria-label="关闭订阅窗口">关闭</button></div><p class="muted">填写订阅链接，保存后即可获取节点。</p><input id="sub-id" type="hidden"><label for="sub-name">订阅名称</label><input id="sub-name" maxlength="60" required placeholder="例如：常用订阅"><label for="sub-url">订阅链接</label><input id="sub-url" type="password" maxlength="4096" autocomplete="off" required placeholder="https://…"><button type="button" class="text-button" id="toggle-sub-url">显示 / 隐藏链接</button><p class="field-note">支持 Clash / Mihomo YAML 和常见节点链接订阅。链接只保存在你自己的服务中。</p><label class="check-row"><input id="sub-enabled" type="checkbox" checked>启用此订阅</label><p id="sub-error" class="error" role="alert"></p><div class="dialog-actions"><button type="button" id="cancel-dialog">取消</button><button type="submit" class="primary">保存订阅</button></div></form></dialog>
+  <dialog id="confirm-dialog" aria-labelledby="confirm-title"><form method="dialog"><h2 id="confirm-title">确认删除订阅？</h2><p id="confirm-message" class="muted"></p><div class="dialog-actions"><button value="cancel">取消</button><button class="danger-button" value="confirm">确认删除</button></div></form></dialog>
+  <div id="toast" role="status" hidden></div>
+</body>
+</html>
