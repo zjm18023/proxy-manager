@@ -34,14 +34,14 @@ HTTP 和 SOCKS5 共用 `7891` 端口。`8787` 不能当作代理端口。`127.0.
 
 安装 **Python 3.11+，推荐 Python 3.12**，安装时勾选添加到 PATH。在新开的 PowerShell 中运行 `python --version`，确认能显示版本号。也可以使用已安装的 `uv`，启动脚本会通过它创建 Python 3.12 环境。
 
-已有项目文件时无需再次下载。如果需要从 GitHub 下载，安装 Git、完成账号授权后执行：
+已有项目文件时无需再次下载。如果需要从 GitHub 下载，安装 Git 后执行：
 
 ```powershell
 Set-Location -LiteralPath 'H:\GPTshengtu2.0'
 git clone https://github.com/zjm18023/proxy-manager.git
 ```
 
-仓库目前为私有仓库，需要有权限的 GitHub 账号。也可以登录 GitHub，选择 **Code → Download ZIP**，解压后使用。下文以 `H:\GPTshengtu2.0\proxy-manager` 为例，存放在其他位置时替换为自己的路径。
+也可以在仓库页面选择 **Code → Download ZIP**，解压后使用。下文以 `H:\GPTshengtu2.0\proxy-manager` 为例，存放在其他位置时替换为自己的路径。
 
 ### 2. 启动并打开页面
 
@@ -114,7 +114,7 @@ docker --version
 docker compose version
 ```
 
-将项目克隆或解压到部署机器，进入含 `compose.yaml` 的项目根目录。Windows 可以直接使用前面的项目目录；Linux 服务器可在配置好私有仓库访问权限后执行：
+将项目克隆或解压到部署机器，进入含 `compose.yaml` 的项目根目录。Windows 可以直接使用前面的项目目录；Linux 服务器可执行：
 
 ```bash
 git clone https://github.com/zjm18023/proxy-manager.git
